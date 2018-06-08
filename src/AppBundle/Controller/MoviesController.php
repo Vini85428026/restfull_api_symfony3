@@ -53,4 +53,15 @@ class MoviesController extends AbstractController
         $em->remove($movie);
         $em->flush();
     }
+
+    /**
+     * @Rest\View()
+     */
+    public function getMovieAction(Movie $movie){
+        if($movie == null){
+            return $this->view(null, 404);
+        }
+
+        return $movie;
+    }
 }
