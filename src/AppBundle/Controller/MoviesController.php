@@ -40,4 +40,17 @@ class MoviesController extends AbstractController
 
         return $movie;
     }
+
+    /**
+     * @Rest\View()
+     */
+    public function deleteMoviesAction(Movie $movie){
+        if($movie == null){
+            return $this->view(null, 404);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($movie);
+        $em->flush();
+    }
 }
