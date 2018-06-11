@@ -14,6 +14,7 @@ use FOS\RestBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations as Rest;
 
 class HumansController extends AbstractController
 {

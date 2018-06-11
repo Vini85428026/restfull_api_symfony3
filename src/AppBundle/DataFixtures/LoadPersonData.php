@@ -2,31 +2,30 @@
 /**
  * Created by PhpStorm.
  * User: marcosvinicius
- * Date: 08/06/18
- * Time: 10:25
+ * Date: 11/06/18
+ * Time: 08:34
  */
 
 namespace AppBundle\DataFixtures;
 
-use AppBundle\Entity\Movie;
+use AppBundle\Entity\Person;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class LoadMovieData extends Fixture
+class LoadPersonData extends Fixture
 {
     /**
      * Load data fixtures with the passed EntityManager
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
-     {
-        $movie1 = new Movie();
-        $movie1->setTitle('The Avengers');
-        $movie1->setYear(2009);
-        $movie1->setTime(180);
-        $movie1->setDescription('Best Movie of heroes');
+    {
+        $person1 = new Person();
+        $person1->setFirstName('Mark');
+        $person1->setLastName('Ruffalo');
+        $person1->setDateOfBirth(new \DateTime('1998-02-02'));
 
-        $manager->persist($movie1);
+        $manager->persist($person1);
         $manager->flush();
-     }
+    }
 }
