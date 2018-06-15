@@ -8,6 +8,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\EntityMerger;
 use AppBundle\Entity\Movie;
 use AppBundle\Entity\Role;
 use AppBundle\Exception\ValidationException;
@@ -21,6 +22,19 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 class MoviesController extends AbstractController
 {
     use ControllerTrait;
+
+    /*
+     * @var EntityMerger
+     */
+    private $entityMerger;
+
+    /*
+     * @param EntityMerger $entityMerger
+     */
+    public function __construct(EntityMerger $entityMerger)
+    {
+        $this->entityMerger = $entityMerger;
+    }
 
     /**
      * @Rest\View()
@@ -79,7 +93,8 @@ class MoviesController extends AbstractController
     /**
      * @Rest\View()
      */
-    public function getMovieRolesAction(Movie $movie){
+    public function getMovieRolesAction(Movie $movie)
+    {
         return $movie->getRoles();
     }
 
@@ -88,7 +103,8 @@ class MoviesController extends AbstractController
      * @ParamConverter("role", converter="fos_rest.request_body", options={"deserializationContext"={"groups"={"Deserialize"}}})
      * @Rest\NoRoute()
      */
-    public function postMovieRolesAction(Movie $movie, Role $role, ConstraintViolationListInterface $validationErrors){
+    public function postMovieRolesAction(Movie $movie, Role $role, ConstraintViolationListInterface $validationErrors)
+    {
         if(count($validationErrors) > 0){
             throw new ValidationException($validationErrors);
         }
@@ -102,5 +118,33 @@ class MoviesController extends AbstractController
         $em->flush();
 
         return $role;
+    }
+
+    /**
+     * @Rest\NoRoute()
+     * @ParamConverter("modifiedMovie", converter="fos_rest.request_body",
+     *      options={"validator" = {"groups" = {"Patch"}}}
+     * )
+     */
+    public function patchMovieAction(?Movie $movie, Movie $modifiedMovie, ConstraintViolationListInterface $validationErrors)
+    {
+        if(null === $movie){
+            return $this->view(null, 404);
+        }
+
+        if(count($validationErrors) > 0){
+            throw new ValidationException($validationErrors);
+        }
+
+        //Merge Entities
+        $this->entityMerger->merge($movie, $modifiedMovie);
+
+        //Persist
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($movie);
+        $em->flush();
+        //Return
+
+        return $movie;
     }
 }
