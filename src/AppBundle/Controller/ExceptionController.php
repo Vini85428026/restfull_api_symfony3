@@ -32,11 +32,11 @@ class ExceptionController extends Controller
             return $this->getView($exception->getStatusCode(), json_decode($exception->getMessage(), true));
         }
 
-        if($exception instanceof HttpException){
+        if($exception instanceof ValidationException){
             return $this->getView($exception->getStatusCode(), $exception->getMessage());
         }
 
-        return $this->getView(null, 'Unexpected error occured.');
+        return $this->getView(null, $exception->getMessage());
     }
 
     /**

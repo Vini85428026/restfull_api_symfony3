@@ -8,11 +8,14 @@
 
 namespace AppBundle\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\Required;
+use Doctrine\Common\Annotations\Annotation\Target;
+
 /**
  * @Annotation
  * @Target({"PROPERTY"})
  */
-class DeserializeEntity
+final class DeserializeEntity
 {
     /**
      * @var string
