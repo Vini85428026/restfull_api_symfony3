@@ -11,6 +11,7 @@ use JMS\Serializer\Annotation as Serializer;
  *
  * @ORM\Table(name="person")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\PersonRepository")
+ * @Serializer\ExclusionPolicy("ALL")
  */
 class Person
 {
@@ -20,6 +21,8 @@ class Person
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"Default", "Deserialize"})
+     * @Serializer\Expose()
      */
     private $id;
 
@@ -28,16 +31,20 @@ class Person
      *
      * @ORM\Column(name="firstName", type="string", length=70)
      * @Assert\NotBlank()
-     * @Assert\Length(min=1, max=255)
+     * @Assert\Length(min=1, max=70)
+     * @Serializer\Groups({"Default", "Deserialize"})
+     * @Serializer\Expose()
      */
     private $firstName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="lastName", type="string", length=100)
+     * @ORM\Column(name="lastName", type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(min=1, max=255)
+     * @Serializer\Groups({"Default", "Deserialize"})
+     * @Serializer\Expose()
      */
     private $lastName;
 
@@ -45,9 +52,11 @@ class Person
      * @var \DateTime
      *
      * @ORM\Column(name="dateOfBirth", type="date")
-     * @Serializer\Type("DateTime<'Y-m-d'>")
-     * @Assert\NotBlank()
      * @Assert\Date()
+     * @Assert\NotBlank()
+     * @Serializer\Type("DateTime<'Y-m-d'>")
+     * @Serializer\Groups({"Default", "Deserialize"})
+     * @Serializer\Expose()
      */
     private $dateOfBirth;
 

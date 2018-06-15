@@ -82,6 +82,8 @@ fos_rest:
     exception:
         enabled: true
         exception_controller: 'AppBundle\Controller\ExceptionController::showAction'
+    serializer:
+        groups: ['Default']
 
 sensio_framework_extra:
     view:
