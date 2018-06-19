@@ -113,15 +113,15 @@ class User implements UserInterface
      */
     public function getApiKey()
     {
-        return $this->api_key;
+        return $this->apiKey;
     }
 
     /**
      * @param string $api_key
      */
-    public function setApiKey($api_key)
+    public function setApiKey($apiKey)
     {
-        $this->api_key = $api_key;
+        $this->apiKey = $apiKey;
     }
 
     /**
