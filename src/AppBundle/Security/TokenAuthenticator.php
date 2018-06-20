@@ -9,6 +9,9 @@
 namespace AppBundle\Security;
 
 
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
+use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +24,15 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
+    /**
+     * @var JWTEncoderInterface
+     */
+    private $jwtEncoder;
+
+    public function __construct(JWTEncoderInterface $jwtEncoder)
+    {
+        $this->jwtEncoder = $jwtEncoder;
+    }
 
     /**
      * Returns a response that directs the user to authenticate.
@@ -73,7 +85,13 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getCredentials(Request $request)
     {
-        $token = $request->headers->get('X-Auth-Token');
+//        $token = $request->headers->get('X-Auth-Token');
+        $extractor = new AuthorizationHeaderTokenExtractor('Bearer', 'Authorization');
+        $token = $extractor->extract($request);
+
+        if(!$token){
+            return null;
+        }
 
         return $token;
     }
@@ -95,7 +113,17 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($credentials);
+        try{
+            $data = $this->jwtEncoder->decode($credentials);
+
+            if(false === $data){
+                return null;
+            }
+
+            return $userProvider->loadUserByUsername($data['username']);
+        }catch(JWTDecodeFailureException $exception){
+            return null;
+        }
     }
 
     /**

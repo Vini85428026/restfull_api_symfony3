@@ -29,13 +29,11 @@ class LoadUserData extends Fixture implements ContainerAwareInterface
 
         $user1 = new User();
         $user1->setUsername('vini_doe');
-        $user1->setApiKey('jPlXPRNgNBQrW7dJ9CsNcnPz');
         $user1->setPassword($passwordEncoder->encodePassword($user1, 'vinidoe'));
         $manager->persist($user1);
 
         $user2 = new User();
         $user2->setUsername('vick_doe');
-        $user2->setApiKey('dwgfsjfk2d2awfddassdgydg');
         $user2 ->setPassword($passwordEncoder->encodePassword($user2, 'vickdoe'));
         $manager->persist($user2);
 
