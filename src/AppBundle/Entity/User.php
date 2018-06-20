@@ -42,6 +42,12 @@ class User implements UserInterface
     private $apiKey;
 
     /**
+     * @var string
+     * @ORM\Column(type="string")
+     */
+    private $password;
+
+    /**
      * Returns the roles granted to the user.
      *
      * <code>
@@ -72,7 +78,7 @@ class User implements UserInterface
      */
     public function getPassword()
     {
-
+        return $this->password;
     }
 
     /**
@@ -130,6 +136,14 @@ class User implements UserInterface
     public function setUsername($username)
     {
         $this->username = $username;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 
 
