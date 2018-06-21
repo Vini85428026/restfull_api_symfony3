@@ -44,24 +44,6 @@ class UserController extends AbstractController
      */
     public function tokenAction(Request $request)
     {
-        $user = $this->getDoctrine()->getRepository('AppBundle:User')
-            ->findOneBy(['username' => $request->getUser()]);
 
-        if (!$user) {
-            throw new BadCredentialsException();
-        }
-
-        $isPasswordValid = $this->passwordEncoder->isPasswordValid($user, $request->getPassword());
-
-        if (!$isPasswordValid) {
-            throw new BadCredentialsException();
-        }
-
-        $token = $this->jwtEncoder->encode([
-            'username' => $user->getUsername(),
-            'exp' => time() + 3600
-        ]);
-
-        return new JsonResponse(['token' => $token]);
     }
 }
