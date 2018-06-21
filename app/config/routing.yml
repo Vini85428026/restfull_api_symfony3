@@ -38,9 +38,16 @@ movies_roles_post:
         _controller: AppBundle\Controller\MoviesController:postMovieRolesAction
         _format: json
 
-user:
-    resource: '@AppBundle/Controller/UserController.php'
-    type: annotation
+users:
+    resource: AppBundle\Controller\UsersController
+    type: rest
+
+users_post:
+    path: /users
+    methods: [POST]
+    defaults:
+        _controller: AppBundle\Controller\UsersController:postUserAction
+        _format: json
 
 tokens:
     resource: AppBundle\Controller\TokensController
