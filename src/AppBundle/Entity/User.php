@@ -8,16 +8,22 @@
 
 namespace AppBundle\Entity;
 
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
+ * @UniqueEntity("username")
  */
 class User implements UserInterface
 {
+
+    const ROLE_USER = "ROLE_USER";
+    const ROLE_ADMIN = "ROLE_ADMIN";
 
     /**
      * @var int
@@ -25,6 +31,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"Default", "Deserialize"})
      */
     private $id;
 
@@ -32,14 +39,59 @@ class User implements UserInterface
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
+     * @Assert\NotBlank(groups={"Default"})
+     * @Serializer\Groups({"Default", "Deserialize"})
      */
     private $username;
 
     /**
      * @var string
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(groups={"Default"})
+     * @Assert\Regex(
+     *     pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
+     *     message="Password must be seven characters long and contain at least one digit, one upper case and one lower case letter",
+     *     groups={"Default"}
+     * )
+     * @Serializer\Groups({"Deserialize"})
      */
     private $password;
+
+    /**
+     * @var string
+     * @Assert\NotBlank(groups={"Default"})
+     * @Assert\Expression(
+     *     "this.getPassword() === this.getRetypedPassword()",
+     *     message = "Password does not match",
+     *     groups={"Default"}
+     * )
+     * @Serializer\Type("string")
+     * @Serializer\Groups({"Deserialize"})
+     */
+    private $retypedPassword;
+
+    /**
+     * @var array
+     * @ORM\Column(type="simple_array", length=200)
+     * @Serializer\Exclude()
+     */
+    private $roles;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRetypedPassword()
+    {
+        return $this->retypedPassword;
+    }
 
     /**
      * Returns the roles granted to the user.
@@ -59,7 +111,23 @@ class User implements UserInterface
      */
     public function getRoles()
     {
-        return ['ROLE_USER'];
+        return $this->roles;
+    }
+
+    /**
+     * @param string $retypedPassword
+     */
+    public function setRetypedPassword($retypedPassword)
+    {
+        $this->retypedPassword = $retypedPassword;
+    }
+
+    /**
+     * @param array $roles
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
     }
 
     /**
