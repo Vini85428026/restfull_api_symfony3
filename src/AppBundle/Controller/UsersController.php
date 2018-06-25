@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -45,6 +46,18 @@ class UsersController extends AbstractController
         $this->jwtEncoder = $jwtEncoder;
     }
 
+    /**
+     * @Rest\View()
+     * @Security("is_granted('show', theUser)", message="Access denied")
+     */
+    public function getUserAction(?User $theUser)
+    {
+        if (null === $theUser) {
+            throw new NotFoundHttpException();
+        }
+
+        return $theUser;
+    }
 
     /**
      * @Rest\View(statusCode=201)
