@@ -28,10 +28,15 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      * @var JWTEncoderInterface
      */
     private $jwtEncoder;
+    /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
 
-    public function __construct(JWTEncoderInterface $jwtEncoder)
+    public function __construct(JWTEncoderInterface $jwtEncoder, TokenStorage $tokenStorage)
     {
         $this->jwtEncoder = $jwtEncoder;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -89,7 +94,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         $extractor = new AuthorizationHeaderTokenExtractor('Bearer', 'Authorization');
         $token = $extractor->extract($request);
 
-        if(!$token){
+        if (!$token) {
             return null;
         }
 
@@ -113,15 +118,19 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        try{
+        try {
             $data = $this->jwtEncoder->decode($credentials);
 
-            if(false === $data){
+            if (false === $data) {
+                return null;
+            }
+
+            if (!$this->tokenStorage->isTokenValid($data['username'], $credentials)) {
                 return null;
             }
 
             return $userProvider->loadUserByUsername($data['username']);
-        }catch(JWTDecodeFailureException $exception){
+        } catch (JWTDecodeFailureException $exception) {
             return null;
         }
     }

@@ -10,11 +10,23 @@ namespace AppBundle\Security;
 
 use AppBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class UserVoter extends Voter
 {
     const SHOW = 'show';
+    const EDIT = 'edit';
+
+    /**
+     * @var AccessDecisionManagerInterface
+     */
+    private $decisionManager;
+
+    public function __construct(AccessDecisionManagerInterface $decisionManager)
+    {
+        $this->decisionManager = $decisionManager;
+    }
 
     /**
      * Determines if the attribute and subject are supported by this voter.
@@ -26,7 +38,7 @@ class UserVoter extends Voter
      */
     protected function supports($attribute, $subject)
     {
-        if (!in_array($attribute, [self::SHOW])) {
+        if (!in_array($attribute, [self::SHOW, self::EDIT])) {
             return false;
         }
 
@@ -51,9 +63,15 @@ class UserVoter extends Voter
         $attribute,
         $subject,
         TokenInterface $token
-    ) {
+    )
+    {
+        if ($this->decisionManager->decide($token, [User::ROLE_ADMIN])) {
+            return true;
+        }
+
         switch ($attribute) {
             case self::SHOW:
+            case self::EDIT:
                 return $this->isUserHimself($subject, $token);
         }
 
